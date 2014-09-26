@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body onload="init1()">
+<canvas id="canvas" width="600" height="400" style="background-image:url(bac.PNG)">Sorry,your browser not support HTML5</canvas>
+<script type="text/javascript">
+var boxx=0;
+var boxy=0;
+var boxwidth=600;
+var boxheight=400;
+var mariowidth=40;
+var marioheight=40;
+var ctx=document.getElementById("canvas").getContext("2d");
+var body=document.getElementsByTagName("body")[0];
+var flag1=false;
+var flag2=false;
+var moveId;
+var isMove=false;
+var gravity=5;
+var jumpId;
+var leftTimer;
+var rightTimer;
+var upTimer;
+var zhuanSpace=72;
+var zhuanwidth=60,zhuanx=60,zhuanheight=40;
+var groundwidth=20,groundheight=50;
+var numberOfGround=Math.ceil(boxwidth/groundwidth)+1;
+var mariox=350,marioy=boxheight-groundheight-marioheight,vx=8,vy=40,recordVy=vy,recordMarioy=marioy;
+var haveUp=false;
+var getClose=false;
+var zhuanvy=20;
+var zhuanTimer;
+var groundImage = new Image();
+groundImage.src="ground.PNG";
+var zhuanImage=new Image();
+zhuanImage.src="marioZhuan.PNG";
+var marioImage=new Image();
+var numberZhuan,yesZhuan=false;
+zhuany=95;
+var recordVx=vx;
+var direct;
+var bacImage=new Image();
+bacImage.src="bac.PNG";
+marioImage.src="marioR.PNG";
+var zhuan1=zhuany,zhuan2=zhuany,zhuan3=zhuany,zhuan4=zhuany;
+var recordZhuany=zhuany,recordZhuanvy=zhuanvy;
+body.addEventListener("keydown",function(event){
+    if(!isMove) {
+        if(event.keyCode==37||event.keyCode==39) {
+            move(event.keyCode);
+        }
+    }
+},false);
+
+body.addEventListener("keyup",function(event){
+    switch (event.keyCode){
+        case 37:{clearInterval(leftTimer);isMove=false;break;}
+        case 39:{clearInterval(rightTimer);isMove=false;break;}
+        case 32:{if(!haveUp){jump();}break;}
+        default :break;
+    }
+},false);
+function moveLeft(){
+    if(mariox<=boxx){
+        vx=0;
+    }
+    else{vx=recordVx;}
+    mariox-=vx;
+}
+function moveRight(){
+    if(mariox+mariowidth>=boxwidth){
+        vx=0;
+    }
+    else{vx=recordVx;}
+    mariox+=vx;
+}
+
+function move(keycode){
+    isMove=true;
+    if(keycode==37){
+        leftTimer=setInterval(moveLeft,10);
+    }
+    if(keycode==39){
+        rightTimer=setInterval(moveRight,10);
+    }
+}
+
+function jump(){
+    if(isMove) {
+        haveUp = true;
+        upTimer = setInterval(jumpForSecond, 50);
+    }
+    else{
+        haveUp=true;
+        isMove=true;
+        upTimer=setInterval(jumpForSecond,50);
+    }
+}
+function jumpForSecond() {
+    marioy -= vy;
+    vy-=gravity;
+    if (marioy==recordMarioy) {
+        haveUp=false;
+        clearInterval(upTimer);
+        isMove = false;
+        vy=recordVy;
+    }
+}
+function drawScene()
+{
+    for (var i = 0; i < numberOfGround; i++) {
+        ctx.drawImage(groundImage, boxx+i*groundwidth, boxheight-groundheight, groundwidth, groundheight);
+    }
+}
+
+
+function whichZhuan(){
+    if(Math.abs(mariox+mariowidth/2-102)<zhuanwidth/2)
+    {yesZhuan=true;numberZhuan=1;}
+    else if(Math.abs(mariox+mariowidth/2-234)<zhuanwidth/2)
+    {yesZhuan=true;numberZhuan=2;}
+    else if(Math.abs(mariox+mariowidth/2-366)<zhuanwidth/2)
+    {yesZhuan=true;numberZhuan=3;}
+    else if(Math.abs(mariox+mariowidth/2-498)<zhuanwidth/2)
+    {yesZhuan=true;numberZhuan=4;}
+}
+function checkMZ(){
+    if(marioy<zhuany+zhuanheight){
+        whichZhuan();
+        if(yesZhuan){
+            if(!getClose){
+                getClose=true;
+                zhuanTimer=setInterval(moveZhuan,70);
+            }
+        }
+    }}
+
+
+
+function moveZhuan(){
+    switch (numberZhuan){
+        case 1:
+            zhuan1-=zhuanvy;
+            zhuanvy-=gravity;
+            if(zhuan1==zhuany){
+                if((marioy+groundheight+marioheight)==boxheight){
+                    getClose=false;
+                }
+                clearInterval(zhuanTimer);
+                zhuanvy=recordZhuanvy;
+                yesZhuan=false;
+            }
+            break;
+        case 2:
+            zhuan2-=zhuanvy;
+            zhuanvy-=gravity;
+            if(zhuan2==zhuany){
+                if((marioy+groundheight+marioheight)==boxheight){
+                    getClose=false;
+                }
+                clearInterval(zhuanTimer);
+                yesZhuan=false;
+                zhuanvy=recordZhuanvy;
+            }
+            break;
+        case 3:
+            zhuan3-=zhuanvy;
+            zhuanvy-=gravity;
+            if(Math.abs(zhuanvy)>recordZhuanvy){
+                if((marioy+groundheight+marioheight)==boxheight){
+                    getClose=false;
+                }
+                clearInterval(zhuanTimer);
+                yesZhuan=false;
+                zhuanvy=recordZhuanvy;
+            }
+            break;
+        case 4:
+            zhuan4-=zhuanvy;
+            zhuanvy-=gravity;
+            if(Math.abs(zhuanvy)>recordZhuanvy){
+                if((marioy+groundheight+marioheight)==boxheight){
+                    getClose=false;
+                }
+                clearInterval(zhuanTimer);
+                yesZhuan=false;
+                zhuanvy=recordZhuanvy;
+            }
+            break;
+        default :break;
+    }
+}
+
+function init1(){
+    setInterval(draw,1000/60);
+}
+function draw(){
+    ctx.clearRect(boxx,boxy,boxwidth,boxheight);
+    checkMZ();
+    drawScene();
+    ctx.drawImage(marioImage,mariox,marioy,mariowidth,marioheight);
+    ctx.drawImage(zhuanImage, 72,zhuan1, zhuanwidth, zhuanheight);
+    ctx.drawImage(zhuanImage, 204,zhuan2, zhuanwidth, zhuanheight);
+    ctx.drawImage(zhuanImage, 336,zhuan3, zhuanwidth, zhuanheight);
+    ctx.drawImage(zhuanImage, 468,zhuan4, zhuanwidth, zhuanheight);
+
+
+}
+
+</script>
+
+</body>
+</html>
